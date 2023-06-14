@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- <script src="./index.js"></script> -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #title {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333333;
+        }
+
+        #subtitle {
+            font-size: 18px;
+            color: #666666;
+        }
+
+        #editor {
+            width: 80%;
+            height: 60%;
+            margin-top: 20px;
+            border: 1px solid #cccccc;
+            border-radius: 10px;
+        }
+
+        #export-button {
+            width: 100px;
+        }
+
+        .editor {
+            margin: 20px;
+            padding: 10px;
+            border: 2px solid black;
+            background-color: lightgray;
+        }
+
+        .code {
+            margin: 10px;
+            padding: 10px;
+            border: 1px dashed black;
+            background-color: white;
+        }
+
+        .htmlcode {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="title">Code Screenshot Tool</div>
+        <div id="subtitle">Create and share beautiful images of your source code</div>
+        <div><select id="DropdownList">
+                <option value="">-- Select Language --</option>
+                <option selected="selected" value="./codemirror/mode/javascript/javascript.min.js">javascript</option>
+            </select>
+            <select id="DropdownList2">
+                <option value="">-- Select Theme --</option>
+                <option selected="selected" value="./codemirror/theme/dracula.min.css">dracula</option>
+            </select>
+        </div>
+        <div id="editor" class="editor">
+            <div class="code">
+                <textarea id="htmlcode" class="htmlcode"></textarea>
+            </div>
+        </div>
+
+        <button id="export-button">Export</button>
+    </div>
+
+
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/javascript/javascript.min.js"></script> -->
+
+    <link rel="stylesheet" href="./codemirror/theme/dracula.min.css">
+    <link rel="stylesheet" href="./codemirror/codemirror.min.css">
+    <script src="./codemirror/codemirror.js"></script> <!-- codemirror.min.js has some issues-->
+    <script src="./codemirror/mode/javascript/javascript.min.js"></script>
+
+    <script>
+
+        // Creating dynamic drop down menus
+
+        // Assume you have an array of file names
+        fileArray = ["apl", "asciiarmor", "asn.1", "asterisk", "brainfuck", "clike", "clojure", "cmake", "cobol", "coffeescript", "commonlisp", "crystal", "css", "cypher", "d", "dart", "diff", "django", "dockerfile", "dtd", "dylan", "ebnf", "ecl", "eiffel", "elm", "erlang", "factor", "fcl", "forth", "fortran", "gas", "gfm", "gherkin", "go", "groovy", "haml", "handlebars", "haskell", "haskell-literate", "haxe", "htmlembedded", "htmlmixed", "http", "idl", "javascript", "jinja2", "jsx", "julia", "livescript", "lua", "markdown", "mathematica", "mbox", "mirc", "mllike", "modelica", "mscgen", "mumps", "nginx", "nsis", "ntriples", "octave", "oz", "pascal", "pegjs", "perl", "php", "pig", "powershell", "properties", "protobuf", "pug", "puppet", "python", "q", "r", "rpm", "rst", "ruby", "rust", "sas", "sass", "scheme", "shell", "sieve", "slim", "smalltalk", "smarty", "solr", "soy", "sparql", "spreadsheet", "sql", "stex", "stylus", "swift", "tcl", "textile", "tiddlywiki", "tiki", "toml", "tornado", "troff", "ttcn", "ttcn-cfg", "turtle", "twig", "vb", "vbscript", "velocity", "verilog", "vhdl", "vue", "wast", "webidl", "xml", "xquery", "yacas", "yaml", "yaml-frontmatter", "z80"];
+
+        // Get the select element by its id
+        let select = document.getElementById("DropdownList");
+
+        // Loop through the array and create option elements for each file name
+        for (let i = 0; i < fileArray.length; i++) {
+            let option = document.createElement("option");
+            let path = "./codemirror/mode/";
+            option.value = path + fileArray[i] + "/" + fileArray[i] + ".min.js";
+            option.text = fileArray[i];
+            select.appendChild(option);
+        }
+
+
+        // for css
+        fileArray = ["3024-day", "3024-night", "abbott", "abcdef", "ambiance", "ambiance-mobile", "ayu-dark", "ayu-mirage", "base16-dark", "base16-light", "bespin", "blackboard", "cobalt", "colorforth", "darcula", "dracula", "duotone-dark", "duotone-light", "eclipse", "elegant", "erlang-dark", "gruvbox-dark", "hopscotch", "icecoder", "idea", "isotope", "juejin", "lesser-dark", "liquibyte", "lucario", "material", "material-darker", "material-ocean", "material-palenight", "mbo", "mdn-like", "midnight", "monokai", "moxer", "neat", "neo", "night", "nord", "oceanic-next", "panda-syntax", "paraiso-dark", "paraiso-light", "pastel-on-dark", "railscasts", "rubyblue", "seti", "shadowfox", "solarized", "ssms", "the-matrix", "tomorrow-night-bright", "tomorrow-night-eighties", "ttcn", "twilight", "vibrant-ink", "xq-dark", "xq-light", "yeti", "yonce", "zenburn"];
+        select = document.getElementById("DropdownList2");
+
+        for (let i = 0; i < fileArray.length; i++) {
+            let option = document.createElement("option");
+            let path = "./codemirror/theme/";
+            option.value = path + fileArray[i] + ".min.css";
+            option.text = fileArray[i];
+            select.appendChild(option);
+        }
+
+        var htmlcodex = CodeMirror.fromTextArea(document.getElementById("htmlcode"), {
+            // Options
+            lineNumbers: true,
+            mode: document.getElementById("DropdownList").options[document.getElementById("DropdownList").selectedIndex].text, // Take this value from drop down list
+            // tabSize: 4,
+            htmlMode: true,
+            theme: document.getElementById("DropdownList2").options[document.getElementById("DropdownList2").selectedIndex].text, // Take this value from second drop down list
+            matchClosing: true
+            // Add any other desired options
+        });
+
+
+        // -------------------------------------------------for script---------------------------------------------------
+
+        function loadScript(url, callback) {
+            // adding the script element to the head as suggested before
+            var head = document.getElementsByTagName('head')[0];
+            var script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = url;
+
+            // then bind the event to the callback function 
+            // there are several events for cross browser compatibility
+            script.onreadystatechange = callback;
+            script.onload = callback;
+
+            // fire the loading
+            head.appendChild(script);
+        }
+
+        // Get the drop down element by its id
+        var dropDown = document.getElementById("DropdownList");
+        var selLang = dropDown.options[dropDown.selectedIndex].text;
+        var myPrettyCode = function () {
+            htmlcodex.setOption("mode", dropDown.options[dropDown.selectedIndex].text);
+        };
+
+        // Add an event listener to the drop down element
+        dropDown.addEventListener("change", function () {
+            // Get the value of the selected option
+            var selLangPath = dropDown.value;
+
+            // Do something with the selected option value
+            loadScript(selLangPath, myPrettyCode);
+        });
+
+        // ----------------------------------------------------for style--------------------------------------------------------
+
+        function loadStyle(url, callback) {
+            // adding the script element to the head as suggested before
+            var head = document.getElementsByTagName('head')[0];
+            var stylesheet = document.createElement('link');
+            stylesheet.rel = 'stylesheet';
+            stylesheet.href = url;
+
+            stylesheet.onreadystatechange = callback;
+            stylesheet.onload = callback;
+
+            head.appendChild(stylesheet);
+        }
+
+        // Get the drop down element by its id
+        var dropDown2 = document.getElementById("DropdownList2");
+        var selLang2 = dropDown2.options[dropDown2.selectedIndex].text;
+
+        var myPrettyCode2 = function () {
+            htmlcodex.setOption("theme", dropDown2.options[dropDown2.selectedIndex].text);
+        };
+
+        // Add an event listener to the drop down element
+        dropDown2.addEventListener("change", function () {
+            // Get the value of the selected option
+            var selLangPath2 = dropDown2.value;
+
+            // Do something with the selected option value
+            loadStyle(selLangPath2, myPrettyCode2);
+        });
+
+        // -----------------------------------export----------------------------------------
+
+        var exportButton = document.getElementById("export-button");
+
+        exportButton.addEventListener("click", function () {
+
+            html2canvas(editor).then(function (canvas) {
+
+                editor.appendChild(canvas);
+
+                // var link = document.createElement("a");
+
+                // link.download = "canvas.png";
+                // link.href = canvas.toDataURL("image/png");
+
+                // link.click();
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>
