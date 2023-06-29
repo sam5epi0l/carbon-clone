@@ -2,8 +2,10 @@
 <html>
 
 <head>
-    <!-- <script src="./index.js"></script> -->
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.js"
+        integrity="sha512-zPMZ/3MBK+R1rv6KcBFcf7rGwLnKS+xtB2OnWkAxgC6anqxlDhl/wMWtDbiYI4rgi/NrCJdXrmNGB8pIq+slJQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,12 +13,11 @@
             padding: 0;
         }
 
-        #container {
+        .container {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
         }
 
         #title {
@@ -30,71 +31,184 @@
             color: #666666;
         }
 
-        #editor {
-            width: 80%;
-            height: 60%;
-            margin-top: 20px;
-            border: 1px solid #cccccc;
+        #DropdownLists {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .DropdownLists {
+            margin-right: 10px;
+            border: none;
+            outline: none;
+            background: #6272a4;
+            color: #f8f8f2;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 5px 10px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            background-color: #571484;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #MyCanvas {
+            max-width: 1000px;
+            padding: 30px;
+            border: 1px solid black;
+            background-color: lightgray;
+            background: #282a36;
+            justify-content: center;
+            align-items: center;
+        }
+
+
+
+        #terminal {
+            padding: 10px;
+            border: 1px black;
+            background-color: purple;
+            background: #44475a;
             border-radius: 10px;
+            /* box-shadow property is rarely used and does not work with png export
+            /* box-shadow: 0 0 20px #000000; */
         }
 
         #export-button {
             width: 100px;
         }
 
-        .editor {
-            margin: 20px;
-            padding: 10px;
-            border: 2px solid black;
-            background-color: lightgray;
-        }
 
-        .code {
+        #icons {
+            display: flex;
+            gap: 10px;
             margin: 10px;
-            padding: 10px;
-            border: 1px dashed black;
-            background-color: white;
         }
 
-        .htmlcode {
-            width: 100%;
-            height: 100%;
+
+
+        #box {
+            border-radius: 10px;
+            padding: 15px;
+            width: 60px;
+            align-items: center;
+        }
+
+        #url {
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        #copy {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+        }
+
+        #copy:hover {
+            background-color: #3e8e41;
+        }
+
+        #message {
+            color: #4CAF50;
+            display: none;
         }
     </style>
+
+
+
 </head>
 
 <body>
-    <div id="container">
+    <div class="container" id="container">
         <div id="title">Code Screenshot Tool</div>
         <div id="subtitle">Create and share beautiful images of your source code</div>
-        <div><select id="DropdownList">
+        <div id="DropdownLists"><select id="DropdownList" class="DropdownLists">
                 <option value="">-- Select Language --</option>
                 <option selected="selected" value="./codemirror/mode/javascript/javascript.min.js">javascript</option>
             </select>
-            <select id="DropdownList2">
+            <select id="DropdownList2" class="DropdownLists">
                 <option value="">-- Select Theme --</option>
                 <option selected="selected" value="./codemirror/theme/dracula.min.css">dracula</option>
             </select>
-        </div>
-        <div id="editor" class="editor">
-            <div class="code">
-                <textarea id="htmlcode" class="htmlcode"></textarea>
+
+            <button class="button" onclick="toggleElement()">Show/Hide</button>
+            <div id="icons">
+                <input type="color" id="icon1" name="icon1" list="icon1-colors" value="#ff0000">
+                <input type="color" id="icon2" name="icon2" list="icon2-colors" value="#ffa500">
+                <input type="color" id="icon3" name="icon3" list="icon3-colors" value="#ffff00">
+                <input type="color" id="icon4" name="icon4" list="icon4-colors" value="#008000">
+            </div>
+            <div id="box">
+                <p id="url" style="display:none;"></p>
+                <button id="copy" onclick="copyUrl()">Share</button>
+                <p id="message">Copied to clipboard</p>
             </div>
         </div>
+        <div id="MyCanvas" class="MyCanvas">
+            <div id="terminal" class="terminal">
+                <div id="dots" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    
+                    <div style="display: flex;"><div class="dot"
+                        style="width: 15px; height: 15px; border-radius: 50%; background-color: #FF5F56; margin-right: 5px;">
+                    </div>
+                    <div class="dot"
+                        style="width: 15px; height: 15px; border-radius: 50%; background-color: #FFBD2E; margin-right: 5px;">
+                    </div>
+                    <div class="dot" style="width: 15px; height: 15px; border-radius: 50%; background-color: #27C93F;">
+                    </div>
+                    </div><div id="language"> <span
+                            id="languagetext"
+                            style="float: right;  color: #c1c1bc; display: flex;  font-family: courier new; background-color: #575c6a; padding: 5px; border-radius: 5px;">
+                            javascript</span></div>
+                </div>
+                <textarea id="editor" class="editor"></textarea>
+            </div>
+        </div>
+    </div>
 
-        <button id="export-button">Export</button>
+    <div id="exporthere" class="container">
+        <button id="export-button">Export with background</button>
+        <button id="export-button2">Export to png</button>
     </div>
 
 
-    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css">
+
+
+    <script>
+        icon1.addEventListener("click", function () {
+            MyCanvas.style.backgroundColor = icon1.value;
+        });
+
+        icon2.addEventListener("click", function () {
+            MyCanvas.style.backgroundColor = icon2.value;
+        });
+
+        icon3.addEventListener("click", function () {
+            MyCanvas.style.backgroundColor = icon3.value;
+        });
+
+        icon4.addEventListener("click", function () {
+            MyCanvas.style.backgroundColor = icon4.value;
+        });
+    </script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/theme/dracula.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/codemirror.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/javascript/javascript.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.9/mode/javascript/javascript.min.js"></script>
 
-    <link rel="stylesheet" href="./codemirror/theme/dracula.min.css">
-    <link rel="stylesheet" href="./codemirror/codemirror.min.css">
-    <script src="./codemirror/codemirror.js"></script> <!-- codemirror.min.js has some issues-->
-    <script src="./codemirror/mode/javascript/javascript.min.js"></script>
 
     <script>
 
@@ -128,19 +242,20 @@
             select.appendChild(option);
         }
 
-        var htmlcodex = CodeMirror.fromTextArea(document.getElementById("htmlcode"), {
+        var editorx = CodeMirror.fromTextArea(document.getElementById("editor"), {
             // Options
             lineNumbers: true,
             mode: document.getElementById("DropdownList").options[document.getElementById("DropdownList").selectedIndex].text, // Take this value from drop down list
-            // tabSize: 4,
             htmlMode: true,
             theme: document.getElementById("DropdownList2").options[document.getElementById("DropdownList2").selectedIndex].text, // Take this value from second drop down list
-            matchClosing: true
+            matchClosing: true,
+            lineWrapping: true
+
             // Add any other desired options
         });
 
 
-        // -------------------------------------------------for script---------------------------------------------------
+        // -------------------------------------------------for script/language---------------------------------------------------
 
         function loadScript(url, callback) {
             // adding the script element to the head as suggested before
@@ -160,19 +275,33 @@
 
         // Get the drop down element by its id
         var dropDown = document.getElementById("DropdownList");
-        var selLang = dropDown.options[dropDown.selectedIndex].text;
-        var myPrettyCode = function () {
-            htmlcodex.setOption("mode", dropDown.options[dropDown.selectedIndex].text);
+        // var selLang = dropDown.options[dropDown.selectedIndex].text;
+        var setLang = function () {
+            editorx.setOption("mode", dropDown.options[dropDown.selectedIndex].text);
         };
 
-        // Add an event listener to the drop down element
-        dropDown.addEventListener("change", function () {
+        function onlangchange() {
+            var selLang1 = dropDown.options[dropDown.selectedIndex].text;
             // Get the value of the selected option
             var selLangPath = dropDown.value;
+            
+            // handle for URL params
+            if (dropDown.value == "") {
+                selLangPath = "./codemirror/mode/" + selLang1 +"/" + selLang1 + ".min.js";
+            }
 
             // Do something with the selected option value
-            loadScript(selLangPath, myPrettyCode);
-        });
+            loadScript(selLangPath, setLang);
+
+            languagetext.innerText = selLang1;
+            // Update the URL parameter for lang
+            var urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('lang', selLang1);
+            history.pushState({}, null, "?" + urlParams.toString());
+        }
+
+        // Add an event listener to the drop down element
+        dropDown.addEventListener("change", onlangchange);
 
         // ----------------------------------------------------for style--------------------------------------------------------
 
@@ -191,40 +320,146 @@
 
         // Get the drop down element by its id
         var dropDown2 = document.getElementById("DropdownList2");
-        var selLang2 = dropDown2.options[dropDown2.selectedIndex].text;
 
-        var myPrettyCode2 = function () {
-            htmlcodex.setOption("theme", dropDown2.options[dropDown2.selectedIndex].text);
+        var setTheme = function () {
+            editorx.setOption("theme", dropDown2.options[dropDown2.selectedIndex].text);
         };
-
-        // Add an event listener to the drop down element
-        dropDown2.addEventListener("change", function () {
+        function onthemechange() {
+            var selStyle = dropDown2.options[dropDown2.selectedIndex].text;
             // Get the value of the selected option
-            var selLangPath2 = dropDown2.value;
+            var selStylePath = dropDown2.value;
 
-            // Do something with the selected option value
-            loadStyle(selLangPath2, myPrettyCode2);
+            // handle for URL params
+            if (dropDown2.value == "") {
+                selStylePath = "./codemirror/theme/" + selStyle + ".min.css";
+            }
+
+            loadStyle(selStylePath, setTheme);
+
+            var urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('theme', selStyle);
+            history.pushState({}, null, "?" + urlParams.toString());
+        }
+        // Add an event listener to the drop down element for theme
+        dropDown2.addEventListener("change", onthemechange);
+
+        editorx.setValue("// Write code here")
+
+        // ------------------------ Setting values from shared URL-----------------------
+
+        var urlParams = new URLSearchParams(window.location.search);
+
+        if (urlParams.has('lang')) {
+            var langParam = urlParams.get('lang')
+            dropDown.options[dropDown.selectedIndex].text = langParam;
+            onlangchange();
+            editorx.setOption("mode", langParam);
+        }
+
+        if (urlParams.has('theme')) {
+            var themeParam = urlParams.get('theme');
+            dropDown2.options[dropDown2.selectedIndex].text = themeParam;
+            onthemechange();
+            editorx.setOption("theme", themeParam);
+        }
+
+        if (urlParams.has('code')) {
+            editorx.setValue(urlParams.get('code'));
+        }
+
+        function toggleElement() {
+            var x = document.getElementById("language");
+            if (x.style.display === "none") {
+                x.style.display = "flex";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+        // --------------------------done---------------------------------------------
+
+        editorx.setSize('100%', '100%')
+
+
+        // On code change modify code parameter
+        editorx.on("change", function () {
+            code = editorx.getValue();
+            var urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('code', code);
+            var code = editorx.getValue();
+            history.pushState({}, null, "?" + urlParams.toString());
         });
+
+
+        function copyUrl() {
+            var url = window.location.href;
+
+            var tempInput = document.createElement("input");
+            tempInput.style.display = "none";
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+
+            tempInput.select();
+            document.execCommand("copy");
+
+            var message = document.getElementById("message");
+            message.style.display = "block";
+
+            setTimeout(function () {
+                message.style.display = "none";
+            }, 3000);
+        }
 
         // -----------------------------------export----------------------------------------
 
+        var canvasElement = null;
         var exportButton = document.getElementById("export-button");
-
         exportButton.addEventListener("click", function () {
 
-            html2canvas(editor).then(function (canvas) {
+            // User htmlToImage to export
+            htmlToImage.toPng(MyCanvas).then(function (dataUrl) {
 
-                editor.appendChild(canvas);
-
+                var img = new Image();
+                img.src = dataUrl;
+                if (canvasElement) {
+                    exporthere.replaceChild(img, canvasElement);
+                } else {
+                    exporthere.appendChild(img);
+                }
+                canvasElement = img;
                 // var link = document.createElement("a");
 
-                // link.download = "canvas.png";
-                // link.href = canvas.toDataURL("image/png");
+                // link.download = "code.png";
+                // link.href = dataUrl;
 
                 // link.click();
             });
 
         });
+
+        var exportButton2 = document.getElementById("export-button2");
+        // Add export in png feature with "terminal" class
+        exportButton2.addEventListener("click", function () {
+
+            htmlToImage.toPng(terminal).then(function (dataUrl) {
+                var img = new Image();
+                img.src = dataUrl;
+                if (canvasElement) {
+                    exporthere.replaceChild(img, canvasElement);
+                } else {
+                    exporthere.appendChild(img);
+                }
+                canvasElement = img;
+                // var link = document.createElement("a");
+
+                // link.download = "code.png";
+                // link.href = dataUrl;
+
+                // link.click();
+            });
+
+        });
+
     </script>
 
 </body>
